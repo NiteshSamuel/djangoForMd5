@@ -3,12 +3,15 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body>
 <h1>Cloud Project</h1>
 <h3>Message digest using md5 algorithm</h3>
-<form action="/external/" method="post"> 
+<form action="/external" method="post"> 
   <label for="input">Input</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <label for="output">Output</label><br>
-  <input type="text" id="input" name="input">
+  <input type="text" name="pinput">
   <!-- <input type="text" id="" name="output" value="{}"><br><br> -->
-  {{data_external}}<br><br>
+  {{data_external}} {{data}}<br><br>
+  
+  {% csrf_token %}
+  <br><br>
   <input type="submit" id="sub" value="Submit">
 </form>
 

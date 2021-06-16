@@ -5,7 +5,6 @@ from math import (
     floor,
     sin,
 )
-
 from bitarray import bitarray
 
 
@@ -74,16 +73,16 @@ class MD5(object):
     @classmethod
     def _step_4(cls, step_2_result):
         # Define the four auxiliary functions that produce one 32-bit word.
-        F = lambda x, y, z: (x & y) | (~x & z)
-        G = lambda x, y, z: (x & z) | (y & ~z)
-        H = lambda x, y, z: x ^ y ^ z
-        I = lambda x, y, z: y ^ (x | ~z)
+        def F(x, y, z): return (x & y) | (~x & z)
+        def G(x, y, z): return (x & z) | (y & ~z)
+        def H(x, y, z): return x ^ y ^ z
+        def I(x, y, z): return y ^ (x | ~z)
 
         # Define the left rotation function, which rotates `x` left `n` bits.
-        rotate_left = lambda x, n: (x << n) | (x >> (32 - n))
+        def rotate_left(x, n): return (x << n) | (x >> (32 - n))
 
         # Define a function for modular addition.
-        modular_add = lambda a, b: (a + b) % pow(2, 32)
+        def modular_add(a, b): return (a + b) % pow(2, 32)
 
         # Compute the T table from the sine function. Note that the
         # RFC starts at index 1, but we start at index 0.
@@ -97,10 +96,12 @@ class MD5(object):
         for chunk_index in range(N // 16):
             # Break the chunk into 16 words of 32 bits in list X.
             start = chunk_index * 512
-            X = [step_2_result[start + (x * 32) : start + (x * 32) + 32] for x in range(16)]
+            X = [step_2_result[start + (x * 32): start + (x * 32) + 32]
+                 for x in range(16)]
 
             # Convert the `bitarray` objects to integers.
-            X = [int.from_bytes(word.tobytes(), byteorder='little') for word in X]
+            X = [int.from_bytes(word.tobytes(), byteorder='little')
+                 for word in X]
 
             # Make shorthands for the buffers A, B, C and D.
             A = cls._buffers[MD5Buffer.A]
@@ -145,18 +146,26 @@ class MD5(object):
                 B = temp
 
             # Update the buffers with the results from this chunk.
-            cls._buffers[MD5Buffer.A] = modular_add(cls._buffers[MD5Buffer.A], A)
-            cls._buffers[MD5Buffer.B] = modular_add(cls._buffers[MD5Buffer.B], B)
-            cls._buffers[MD5Buffer.C] = modular_add(cls._buffers[MD5Buffer.C], C)
-            cls._buffers[MD5Buffer.D] = modular_add(cls._buffers[MD5Buffer.D], D)
+            cls._buffers[MD5Buffer.A] = modular_add(
+                cls._buffers[MD5Buffer.A], A)
+            cls._buffers[MD5Buffer.B] = modular_add(
+                cls._buffers[MD5Buffer.B], B)
+            cls._buffers[MD5Buffer.C] = modular_add(
+                cls._buffers[MD5Buffer.C], C)
+            cls._buffers[MD5Buffer.D] = modular_add(
+                cls._buffers[MD5Buffer.D], D)
 
     @classmethod
     def _step_5(cls):
         # Convert the buffers to little-endian.
-        A = struct.unpack('<I', struct.pack('>I', cls._buffers[MD5Buffer.A]))[0]
-        B = struct.unpack('<I', struct.pack('>I', cls._buffers[MD5Buffer.B]))[0]
-        C = struct.unpack('<I', struct.pack('>I', cls._buffers[MD5Buffer.C]))[0]
-        D = struct.unpack('<I', struct.pack('>I', cls._buffers[MD5Buffer.D]))[0]
+        A = struct.unpack('<I', struct.pack(
+            '>I', cls._buffers[MD5Buffer.A]))[0]
+        B = struct.unpack('<I', struct.pack(
+            '>I', cls._buffers[MD5Buffer.B]))[0]
+        C = struct.unpack('<I', struct.pack(
+            '>I', cls._buffers[MD5Buffer.C]))[0]
+        D = struct.unpack('<I', struct.pack(
+            '>I', cls._buffers[MD5Buffer.D]))[0]
 
         # Output the buffers in lower-case hexadecimal format.
         return f"{format(A, '08x')}{format(B, '08x')}{format(C, '08x')}{format(D, '08x')}"
